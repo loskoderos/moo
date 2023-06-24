@@ -23,7 +23,7 @@ Looking for some decent PHP framework? Go learn Symfony, Laravel or anything tha
 If you really have to, here you go, just use composer.
 ~~~
 composer config minimum-stability dev
-composer require loskoderos/moo:dev-master
+composer require loskoderos/moo:dev-main
 ~~~
 
 ## Hello World
