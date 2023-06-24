@@ -2,7 +2,8 @@
 
 Question is not _what_ is Moo, but _why_ is Moo?
 
-There is time that every PHP developer _has to_ create its own framework. Most of them are crap, this one is no exception. 
+There is time that every PHP developer _has to_ create its own framework.
+Most of them are crap, this one is no exception. 
 
 So, Moo, the framework, is a spawn of PHP evil created for making life and debugging miserable. It took a couple of hours to create, but can take days to find out what and why works or does not. Like most microframeworks, Moo is quite close to HTTP world, made of bunch of pure PHP classes with no external dependencies. Just router, request, response, boom done.
 
@@ -16,7 +17,7 @@ Seriously, for 99% of time you should not use this framework. Don't do it for sa
 
 The only exception to that I can think of, is when you consider using raw .php scripts somewhere on a server. If that is the case, Moo can actually be useful.
 
-Looking for some decent PHP framework? Go learn Symfony, Laravel or anything that actually has any community around. This one does not have any. Actually, you can try writing _your own_ sacred micro framework, just like Moo to learn and validate your PHP skills.
+Looking for some decent PHP framework? Go learn Symfony, Laravel or anything that actually has any community around. This one does not have any. Actually, you can try writing _your own_ micro framework, just like Moo to learn and validate your PHP skills.
 
 ## Installation
 If you really have to, here you go, just use composer.
@@ -221,7 +222,7 @@ $moo->flush = function () use ($moo) {
 ~~~
 
 ## Testing
-Moo is unittested, just run `make run`.
+Moo is unit tested, just run `make run`.
 
 ## Contributing
 Contributions are welcome, please submit a pull request.
