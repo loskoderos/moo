@@ -25,6 +25,18 @@ composer config minimum-stability dev
 composer require loskoderos/gpx-php:dev-master
 ~~~
 
+## Hello World
+~~~php
+<?php
+$moo = new Moo\Moo();
+
+$moo->get('/', function () {
+    return "Hello, this is Moo!";
+});
+
+$moo();
+~~~
+
 ## Usage
 This is the sample Moo app.
 ~~~php
