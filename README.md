@@ -31,7 +31,7 @@ This is the sample Moo app.
 <?php
 $moo = new Moo\Moo();
 
-$moo->get('\', function () {
+$moo->get('/', function () {
     echo "Hello, this is Moo!";
 });
 
@@ -71,7 +71,7 @@ Here is what happends when you call `$moo(...)`:
     finish --> |$moo->finish| flush
 ```
 
-### HTTP Methods
+### Routing
 You can bind handlers to standard HTTP methods:
 - GET: `$moo->get(...)`
 - HEAD: `$moo->head(...)`
@@ -82,12 +82,105 @@ You can bind handlers to standard HTTP methods:
 - OPTIONS: `$moo->options(...)`
 - TRACE: `$moo->trace(...)`
 - PATCH: `$moo->patch(...)`
+
 You can match multiple methods using `$moo->route(...)`.
 
-### Routing
+Routes are matched from the first to the last. If no route matches the request, the error handler is called `$moo->error(...)`.
+
+### Parameters
+Route can be parametrized with regular expressions.
+~~~php
+$moo->post('/orders/(\d+)/items/(\d+)', function ($orderId, $itemId) use ($moo) {
+    return $moo->orderService->findOrderItem($orderId, $itemId);
+});
+~~~
+
+### Init & Finish
+There are two handlers pre and post request, the init and the finish.
+~~~php
+$moo->init = function () {
+    echo "Hey I'm init";
+};
+$moo->finish = function () {
+    echo "Hey I'm finish";
+};
+$moo();
+~~~
+
+### Error Handling
+By default exceptions are handled by the error handlers, that also works when no route matches request.
+~~~php
+$this->error = function(\Exception $exc) {
+    $this->response = new Response([
+        'code' => $exc->getCode() > 0 ? $exc->getCode() : 500,
+        'message' => StatusCode::message($exc->getCode()),
+        'body' => $exc->getMessage()
+    ]);
+};
+~~~
+
 ### Request
+The `Moo\Request` class consists of:
+- method
+- uri
+- headers
+- query
+- post
+- files
+- body
+
+Request object `$moo->request` is created before `init` with the values taken from PHP global variables, `$_SERVER`, `$_GET`, `$_POST`, `$_FILES`.
+
+*Request body is empty by default!*
+You can override that with ini:
+~~~php
+$moo->init = function () ($moo) {
+    $moo->request->body = file_get_contents('php://input');
+};
+~~~
+
 ### Response
+The `Moo\Response` class consists of:
+- body
+- headers
+- code
+- message
+
+Response object `$moo->response` is created before `init` and can be modified during the request lifecycle. Response body is not serialized, it is assumed you serialize it before `flush` in `finish`.
+
+### State
+You can use Moo to keep your application state.
+~~~php
+$moo->something = 123;
+$moo->myState = [
+    'config' => [
+        'host' => 'localhost',
+        'port' => 1234
+    ]
+];
+~~~
+
 ### Plugins
+You can extend Moo with custom functions.
+~~~php
+$moo->foobar = function () {
+    return 123;
+};
+$moo->foobar();
+~~~
+
+### Flush & Output Buffering
+By default all output is buffered and then flushed at the end of `$moo()` execution.
+You can override that behaviour by setting custom flush handler.
+~~~php
+$moo->flush = function () use ($moo) {
+    header('HTTP/1.1 ' . $moo->response->code . ' ' . $moo->response->message);
+    foreach ($moo->response->headers as $name => $value) {
+        header($name.': '.$value, true);
+    }
+    echo $moo->response->body;
+};
+~~~
 
 ## Testing
 Moo is unittested, just run `make run`.
