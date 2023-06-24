@@ -26,7 +26,7 @@ composer require loskoderos/gpx-php:dev-master
 ~~~
 
 ## Usage
-This is the Moo hello world app.
+This is the sample Moo app.
 ~~~php
 <?php
 $moo = new Moo\Moo();
@@ -38,10 +38,50 @@ $moo->get('\', function () {
 $moo();
 ~~~
 
-## Documentation
-In progress...
+## Examples
+There are some examples in the `examples` directory.
+To run them you can use builtin PHP server.
+~~~
+php -S 0.0.0.0:8080 examples/hello-world/index.php
+~~~
 
-## Testing & Development
+## Documentation
+The goal of Moo is simplicity, flexibility and ease of use.
+
+### Concepts
+Moo is written in PHP and is closure based. From design perspective it is a front controller the `Moo\Moo` class exposing set of HTTP methods to bind routing handlers as closurers. Additionally, Moo acts as a state container and can be extended with closure plugins.
+
+All Moo components reside in the PSR-4 `Moo` namespace. The main component is the `Moo\Moo` class. There are three models: `Moo\Request`, `Moo\Response`, `Moo\Route` and the `Moo\Router` that does route matching.
+
+Moo does output buffering, so you can simply output with echo or return a serializable value in the closure.
+
+### Lifecycle
+Here is what happends when you call `$moo(...)`:
+```mermaid
+flowchart LR
+    init["$moo->init(...)"]
+    finish["$moo->finish(...)"]
+    init --> finish
+```
+
+### HTTP Methods
+You can bind handlers to standard HTTP methods:
+- GET: `$moo->get(...)`
+- HEAD: `$moo->head(...)`
+- POST: `$moo->post(...)`
+- PUT:  `$moo->put(...)`
+- DELETE: `$moo->delete(...)`
+- CONNECT: `$moo->connect(...)`
+- OPTIONS: `$moo->options(...)`
+- TRACE: `$moo->trace(...)`
+- PATCH: `$moo->patch(...)`
+
+### Routing
+### Request
+### Response
+### Plugins
+
+## Testing
 Moo is unittested, just run `make run`.
 
 ## Contributing
