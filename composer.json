@@ -1,0 +1,32 @@
+{
+    "name": "loskoderos/moo",
+    "description": "Moo is a PHP micro framework for fast prototyping",
+    "type": "library",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Lukasz Cepowski",
+            "email": "lukasz@cepowski.com",
+            "homepage": "https://cepowski.com"
+        }
+    ],
+    "support": {
+        "email": "hello@loskoderos.com"
+    },
+    "require": {
+        "loskoderos/generic-php": "dev-master",
+        "php": ">=8.0"
+    },
+    "require-dev": {
+    },
+    "autoload": {
+        "psr-4": {
+            "Moo\\": "src/Moo"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Tests\\Moo\\": "test/Tests/Moo"
+        }
+    }
+}
