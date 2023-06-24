@@ -23,7 +23,7 @@ Looking for some decent PHP framework? Go learn Symfony, Laravel or anything tha
 If you really have to, here you go, just use composer.
 ~~~
 composer config minimum-stability dev
-composer require loskoderos/gpx-php:dev-master
+composer require loskoderos/moo:dev-master
 ~~~
 
 ## Hello World
@@ -222,7 +222,7 @@ $moo->flush = function () use ($moo) {
 ~~~
 
 ## Testing
-Moo is unit tested, just run `make run`.
+Moo is unit tested, just run `make test`.
 
 ## Contributing
 Contributions are welcome, please submit a pull request.
