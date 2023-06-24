@@ -31,10 +31,35 @@ This is the sample Moo app.
 <?php
 $moo = new Moo\Moo();
 
+// Use moo as service container, inject dependency.
+$moo->bookService = new App\BookService();
+
+// Override init to set Content-Type header.
+$moo->init = function () use ($moo) {
+    $moo->headers->set('Content-Type', 'application/json');
+};
+
+// Override finish, to serialize output to JSON.
+$moo->finish = function () use ($moo) {
+    $moo->response->body = json_encode($moo->response->body);
+}
+
+// Custom plugin.
+$moo->findBookById = function ($bookId) use ($moo) {
+    return $moo->bookService->find($bookId);
+}
+
+// Define index handler.
 $moo->get('/', function () {
-    echo "Hello, this is Moo!";
+    echo "Hello, this is Moo bookstore!";
 });
 
+// Define `GET /books/<id>` handler.
+$moo->get('/books/(\d+)', function ($bookId) use ($moo) {
+    return $moo->findBookById($bookId);
+});
+
+// Run Moo, dispatch.
 $moo();
 ~~~
 
