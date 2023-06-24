@@ -26,6 +26,7 @@ composer require loskoderos/gpx-php:dev-master
 ~~~
 
 ## Hello World
+Simplest Moo application.
 ~~~php
 <?php
 $moo = new Moo\Moo();
@@ -38,7 +39,7 @@ $moo();
 ~~~
 
 ## Usage
-This is the sample Moo app.
+This is the sample Moo app with more features presented like state container, plugins and parametrized routing.
 ~~~php
 <?php
 $moo = new Moo\Moo();
