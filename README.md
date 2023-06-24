@@ -58,16 +58,17 @@ Moo does output buffering, so you can simply output with echo or return a serial
 ### Lifecycle
 Here is what happends when you call `$moo(...)`:
 ```mermaid
-flowchart TD
-    init["Pre request hook, $moo->init(...)"]
-    dispatch["Match route, $moo->get(...), $moo->post(...), etc..."]
-    error["Run error hook if no route matched request, $moo->error(...)"]
-    finish["Post request hook, $moo->finish(...)"]
-    flush["Flush output, $moo->flush(...)]
-    init --> dispatch
-    dispatch --> error
-    error --> finish
-    finish --> flush
+
+  flowchart TD
+    init["Pre request hook"]
+    dispatch["Match route"]
+    error["Run error hook if no route matched request"]
+    finish["Post request hook"]
+    flush["Flush output"]
+    init --> |$moo->init| dispatch
+    dispatch --> |$moo->get, $moo->post, ...| error
+    error --> |$moo->error| finish
+    finish --> |$moo->finish| flush
 ```
 
 ### HTTP Methods
