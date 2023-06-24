@@ -149,8 +149,8 @@ $moo();
 ### Error Handling
 By default exceptions are handled by the error handlers, that also works when no route matches request.
 ~~~php
-$this->error = function(\Exception $exc) {
-    $this->response = new Response([
+$moo->error = function(\Exception $exc) use ($moo) {
+    $moo->response = new Response([
         'code' => $exc->getCode() > 0 ? $exc->getCode() : 500,
         'message' => StatusCode::message($exc->getCode()),
         'body' => $exc->getMessage()
