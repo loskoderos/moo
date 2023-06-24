@@ -49,7 +49,7 @@ $moo->bookService = new App\BookService();
 
 // Override init to set Content-Type header.
 $moo->init = function () use ($moo) {
-    $moo->headers->set('Content-Type', 'application/json');
+    $moo->response->headers->set('Content-Type', 'application/json');
 };
 
 // Override finish to serialize output to JSON.
