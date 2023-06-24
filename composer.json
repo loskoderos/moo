@@ -1,6 +1,6 @@
 {
     "name": "loskoderos/moo",
-    "description": "Moo is a PHP micro framework for fast prototyping",
+    "description": "Moo is a PHP micro framework to make life and debugging miserable",
     "type": "library",
     "license": "MIT",
     "authors": [

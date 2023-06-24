@@ -13,7 +13,7 @@ Of course, it would be easier, faster and wiser to just use any other off shelf 
 Why not.
 
 ## Why use _Moo_?
-Seriously, for 99% of time you should not use this framework. Don't do it for sake of your and other developers wellbeing and mental health. 
+Seriously, for 99% of time you should not use this framework. Don't do it for sake of yours and other developers wellbeing and mental health. 
 
 The only exception to that I can think of, is when you consider using raw .php scripts somewhere on a server. If that is the case, Moo can actually be useful.
 
