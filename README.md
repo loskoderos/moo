@@ -39,7 +39,7 @@ $moo->init = function () use ($moo) {
     $moo->headers->set('Content-Type', 'application/json');
 };
 
-// Override finish, to serialize output to JSON.
+// Override finish to serialize output to JSON.
 $moo->finish = function () use ($moo) {
     $moo->response->body = json_encode($moo->response->body);
 }
@@ -59,7 +59,7 @@ $moo->get('/books/(\d+)', function ($bookId) use ($moo) {
     return $moo->findBookById($bookId);
 });
 
-// Run Moo, dispatch.
+// Run Moo.
 $moo();
 ~~~
 
