@@ -102,7 +102,7 @@ $app = new Application();
 $app();
 ~~~
 
-To test it and make your colleagues happy.
+Test it and make your colleagues happy.
 ~~~php
 <?php
 
