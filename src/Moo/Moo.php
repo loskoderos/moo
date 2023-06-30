@@ -101,7 +101,12 @@ class Moo {
         OutputBuffer::begin();
         try {
             is_callable($this->before) ? $this->before() : null;
-            $this->response->body = $this->router->dispatch($this->request);
+            
+            $result = $this->router->dispatch($this->request);
+            if ($result !== null) {
+                $this->response->body = $result;
+            }
+            
             is_callable($this->after) ? $this->after() : null;
 
         } catch (\Exception $exc) {

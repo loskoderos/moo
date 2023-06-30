@@ -334,6 +334,25 @@ class MooTest extends TestCase
         $this->assertEquals('test', $moo->response->body);
     }
 
+    public function testCallableReturnValueOverrideBody()
+    {
+        $moo = new Moo();
+        $moo->flush = null;
+        $moo->get('/test1', function () use ($moo) {
+            $moo->response->body = 123;
+        });
+        $moo->get('/test2', function () use ($moo) {
+            $moo->response->body = 456;
+            return 'xyz';
+        });
+
+        $moo(new Request(['uri' => '/test1']));
+        $this->assertEquals(123, $moo->response->body);
+
+        $moo(new Request(['uri' => '/test2']));
+        $this->assertEquals('xyz', $moo->response->body);
+    }
+
     protected function assertRouteFound(Moo $moo, array $methods, array $uris, string $expected)
     {
         foreach ($methods as $method) {
