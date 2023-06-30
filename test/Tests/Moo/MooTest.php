@@ -4,6 +4,7 @@ namespace Tests\Moo;
 
 use PHPUnit\Framework\TestCase;
 use Moo\Moo;
+use Moo\Response;
 use Moo\Request;
 use Moo\Router;
 
@@ -16,6 +17,54 @@ function array_exclude(array $excluded, array $source)
         }
     }
     return $result;
+}
+
+class ClassyMooMock extends Moo
+{
+    public int $state = 0;
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->get('/', [$this, 'index']);
+        $this->post('/test/(\d+)', [$this, 'test']);
+    }
+
+    public function before()
+    {
+        $this->state++;
+    }
+
+    public function after()
+    {
+        $this->state++;
+    }
+
+    public function flush()
+    {
+        // Keep it empty.
+    }
+
+    public function error(\Exception $exc)
+    {
+        $this->state = -1;
+        $this->response = new Response([
+            'code' => 404,
+            'message' => 'Not Found',
+            'body' => 'error'
+        ]);
+    }
+
+    public function index()
+    {
+        return 'hello world';
+    }
+
+    public function test($x)
+    {
+        $this->response->code = 202;
+        return $x;
+    }
 }
 
 class MooTest extends TestCase
@@ -299,6 +348,48 @@ class MooTest extends TestCase
         $this->assertRouteNotFound($moo, array_exclude(['PATCH'], self::METHODS), ['/']);
     }
 
+    public function testCallableReturnValueOverrideBody()
+    {
+        $moo = new Moo();
+        $moo->flush = null;
+        $moo->get('/test1', function () use ($moo) {
+            $moo->response->body = 123;
+        });
+        $moo->get('/test2', function () use ($moo) {
+            $moo->response->body = 456;
+            return 'xyz';
+        });
+
+        $moo(new Request(['uri' => '/test1']));
+        $this->assertEquals(123, $moo->response->body);
+
+        $moo(new Request(['uri' => '/test2']));
+        $this->assertEquals('xyz', $moo->response->body);
+    }
+
+    public function testClassyMoo()
+    {
+        $app = new ClassyMooMock();
+
+        $app();
+        $this->assertEquals(200, $app->response->code);
+        $this->assertEquals('hello world', $app->response->body);
+        $this->assertEquals(2, $app->state);
+
+        $app(new Request(['method' => 'POST', 'uri' => '/test/123']));
+        $this->assertEquals(202, $app->response->code);
+        $this->assertEquals('123', $app->response->body);
+        $this->assertEquals(4, $app->state);
+
+        $app(new Request(['method' => 'GET', 'uri' => '/test/123']));
+        $this->assertEquals(404, $app->response->code);
+        $this->assertEquals('error', $app->response->body);
+        $this->assertEquals(-1, $app->state);
+    }
+
+    /**
+     * Keep this test last because it overrides values of global variables.
+     */
     public function testRequestFactory()
     {
         global $_SERVER;
@@ -332,25 +423,6 @@ class MooTest extends TestCase
         $this->assertEquals(200, $moo->response->code);
         $this->assertEquals('OK', $moo->response->message);
         $this->assertEquals('test', $moo->response->body);
-    }
-
-    public function testCallableReturnValueOverrideBody()
-    {
-        $moo = new Moo();
-        $moo->flush = null;
-        $moo->get('/test1', function () use ($moo) {
-            $moo->response->body = 123;
-        });
-        $moo->get('/test2', function () use ($moo) {
-            $moo->response->body = 456;
-            return 'xyz';
-        });
-
-        $moo(new Request(['uri' => '/test1']));
-        $this->assertEquals(123, $moo->response->body);
-
-        $moo(new Request(['uri' => '/test2']));
-        $this->assertEquals('xyz', $moo->response->body);
     }
 
     protected function assertRouteFound(Moo $moo, array $methods, array $uris, string $expected)

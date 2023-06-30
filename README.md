@@ -77,6 +77,31 @@ $moo->get('/books/(\d+)', function ($bookId) use ($moo) {
 $moo();
 ~~~
 
+## Classy Moo
+Some may need a to write a posh code, if you need style you may try the following.
+~~~php
+<?php
+
+use Moo\Moo;
+
+class Application extends Moo
+{
+    public function __construct()
+    {
+        parent::__construct();
+        $this->get('/', [$this, 'index']);
+    }
+
+    public function index()
+    {
+        echo 'Hello World';
+    }
+}
+
+$app = new Application();
+$app();
+~~~
+
 ## Examples
 There are some examples in the `examples` directory.
 To run them you can use builtin PHP server.
