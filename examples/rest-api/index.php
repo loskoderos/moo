@@ -6,11 +6,11 @@ require dirname(__FILE__) . '/BookService.php';
 $moo = new Moo\Moo();
 $moo->bookService = new BookService();
 
-$moo->init = function () use ($moo) {
+$moo->before = function () use ($moo) {
     $moo->request->body = file_get_contents('php://input');
 };
 
-$moo->finish = function () use ($moo) {
+$moo->after = function () use ($moo) {
     $moo->response->headers->set('Content-Type', 'application/json');
     $moo->response->body = json_encode($moo->response->body);
 };

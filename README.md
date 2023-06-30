@@ -48,13 +48,13 @@ $moo = new Moo\Moo();
 // Use moo as service container, inject dependency.
 $moo->bookService = new App\BookService();
 
-// Override init to set Content-Type header.
-$moo->init = function () use ($moo) {
+// Override the before hook to set Content-Type header.
+$moo->before = function () use ($moo) {
     $moo->response->headers->set('Content-Type', 'application/json');
 };
 
-// Override finish to serialize output to JSON.
-$moo->finish = function () use ($moo) {
+// Override the after hook to serialize output to JSON.
+$moo->after = function () use ($moo) {
     $moo->response->body = json_encode($moo->response->body);
 }
 
@@ -99,15 +99,15 @@ Here is what happends when you call `$moo(...)`:
 ```mermaid
 
   flowchart TD
-    init["Pre request hook"]
+    before["Pre request hook"]
     dispatch["Match route"]
     error["Run error hook if no route matched request"]
-    finish["Post request hook"]
+    after["Post request hook"]
     flush["Flush output"]
-    init --> |$moo->init| dispatch
+    before --> |$moo->before| dispatch
     dispatch --> |$moo->get, $moo->post, ...| error
-    error --> |$moo->error| finish
-    finish --> |$moo->finish| flush
+    error --> |$moo->error| after
+    after --> |$moo->after| flush
 ```
 
 ### Routing
@@ -134,14 +134,14 @@ $moo->post('/orders/(\d+)/items/(\d+)', function ($orderId, $itemId) use ($moo) 
 });
 ~~~
 
-### Init & Finish
-There are two handlers pre and post request, the init and the finish.
+### Before & After hooks
+There are two handlers pre and post request, the before and the after.
 ~~~php
-$moo->init = function () {
-    echo "Hey I'm init";
+$moo->before = function () {
+    echo "Hey I'm the before hook";
 };
-$moo->finish = function () {
-    echo "Hey I'm finish";
+$moo->after = function () {
+    echo "Hey I'm the after hook";
 };
 $moo();
 ~~~
@@ -168,12 +168,12 @@ The `Moo\Request` class consists of:
 - files
 - body
 
-Request object `$moo->request` is created before `init` with the values taken from PHP global variables, `$_SERVER`, `$_GET`, `$_POST`, `$_FILES`.
+Request object `$moo->request` is created before `before` with the values taken from PHP global variables, `$_SERVER`, `$_GET`, `$_POST`, `$_FILES`.
 
 *Request body is empty by default!*
 You can override that with ini:
 ~~~php
-$moo->init = function () ($moo) {
+$moo->before = function () ($moo) {
     $moo->request->body = file_get_contents('php://input');
 };
 ~~~
@@ -185,7 +185,7 @@ The `Moo\Response` class consists of:
 - code
 - message
 
-Response object `$moo->response` is created before `init` and can be modified during the request lifecycle. Response body is not serialized, it is assumed you serialize it before `flush` in `finish`.
+Response object `$moo->response` is created before `before` and can be modified during the request lifecycle. Response body is not serialized, it is assumed you serialize it before `flush` in `after`.
 
 ### State
 You can use Moo to keep your application state.

@@ -22,15 +22,15 @@ class MooTest extends TestCase
 {
     const METHODS = ['GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT', 'OPTIONS', 'TRACE', 'PATCH', 'GET'];
 
-    public function testInitFinish()
+    public function testBeforeAfter()
     {
         $test = 0;
         $moo = new Moo();
         $moo->flush = null;
-        $moo->init =function () use (&$test) {
+        $moo->before =function () use (&$test) {
             $test++;
         };
-        $moo->finish = function () use (&$test) {
+        $moo->after = function () use (&$test) {
             $test++;
         };
         $moo->route('/', function () { return 'xxx'; });
@@ -42,7 +42,7 @@ class MooTest extends TestCase
     {
         $test = 0;
         $moo = new Moo();
-        $moo->init = function () use(&$test) {
+        $moo->before = function () use(&$test) {
             $test++;
             throw new \RuntimeException("test");
         };

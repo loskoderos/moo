@@ -15,8 +15,8 @@ class Moo {
     public function __construct()
     {
         $this->router = new Router();
-        $this->init = function() {};
-        $this->finish = function() {};
+        $this->before = function() {};
+        $this->after = function() {};
         $this->error = function(\Exception $exc) {
             $this->response = new Response([
                 'code' => $exc->getCode() > 0 ? $exc->getCode() : 500,
@@ -100,9 +100,9 @@ class Moo {
 
         OutputBuffer::begin();
         try {
-            is_callable($this->init) ? $this->init() : null;
+            is_callable($this->before) ? $this->before() : null;
             $this->response->body = $this->router->dispatch($this->request);
-            is_callable($this->finish) ? $this->finish() : null;
+            is_callable($this->after) ? $this->after() : null;
 
         } catch (\Exception $exc) {
             is_callable($this->error) ? $this->error($exc) : throw $exc;
