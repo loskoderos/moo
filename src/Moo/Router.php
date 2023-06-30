@@ -28,13 +28,15 @@ class Router
         return $this;
     }
 
-    public function dispatch(Request $request): mixed
+    public function dispatch(Request $request, Response $response): mixed
     {
         $uri = parse_url(preg_replace('/(\/+)/', '/', $request->uri))['path'];
         foreach ($this->routes as $route) {
             if ($route->method == '*' || $route->method == $request->method) {
                 if (preg_match("#^{$route->uri}$#", $uri, $matches)) {
-                    if (is_callable($route->callback)) {
+                    if ($route->callback instanceof Moo) {
+                        return call_user_func($route->callback, $request, $response);
+                    } else if (is_callable($route->callback)) {
                         return call_user_func_array($route->callback, array_slice($matches, 1));
                     } else {
                         throw new \RuntimeException("Route $method $uri is not callable");

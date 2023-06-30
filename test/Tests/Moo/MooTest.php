@@ -371,7 +371,7 @@ class MooTest extends TestCase
     {
         $app = new ClassyMooMock();
 
-        $app();
+        $app(new Request());
         $this->assertEquals(200, $app->response->code);
         $this->assertEquals('hello world', $app->response->body);
         $this->assertEquals(2, $app->state);
@@ -385,6 +385,47 @@ class MooTest extends TestCase
         $this->assertEquals(404, $app->response->code);
         $this->assertEquals('error', $app->response->body);
         $this->assertEquals(-1, $app->state);
+    }
+
+    public function testNestedMoo()
+    {
+        $mooA = new Moo();
+        $mooA->get('/a/test', function () {
+            return 'test a';
+        });
+
+        $mooB = new Moo();
+        $mooB->get('/b/test', function () {
+            return 'test b';
+        });
+
+        $moo = new Moo();
+        $moo->flush = null;
+        $moo->route('/a/.*', $mooA);
+        $moo->route('/b/.*', $mooB);
+
+        $moo(new Request());
+        $this->assertEquals(404, $moo->response->code);
+
+        $moo(new Request(['uri' => '/a/']));
+        $this->assertEquals(404, $moo->response->code);
+
+        $moo(new Request(['uri' => '/a/xxx']));
+        $this->assertEquals(404, $moo->response->code);
+
+        $moo(new Request(['uri' => '/a/test']));
+        $this->assertEquals(200, $moo->response->code);
+        $this->assertEquals('test a', $moo->response->body);
+
+        $moo(new Request(['uri' => '/b/']));
+        $this->assertEquals(404, $moo->response->code);
+
+        $moo(new Request(['uri' => '/b/xxx']));
+        $this->assertEquals(404, $moo->response->code);
+
+        $moo(new Request(['uri' => '/b/test']));
+        $this->assertEquals(200, $moo->response->code);
+        $this->assertEquals('test b', $moo->response->body);
     }
 
     /**

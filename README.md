@@ -127,6 +127,31 @@ class ApplicationTest extends TestCase
 }
 ~~~
 
+## Nesting
+You can actually use one instance of Moo as a callback in another Moo.
+~~~php
+<?php
+
+use Moo\Moo;
+
+$usersMoo = new Moo();
+$usersMoo->get('/users/(\d+)', function ($id) {
+    // ...
+});
+
+$booksMoo = new Moo();
+$booksMoo->get('/books/(\d+)', function ($id) {
+    // ...
+});
+
+$moo = new Moo()
+$moo->route('/users/.*', $usersMoo);
+$moo->route('/books/.*', $booksMoo);
+
+$moo();
+~~~
+Note that, when nested, only the top level `flush` is being used therefore the output from `$moo` is sent only once.
+
 ## Examples
 There are some examples in the `examples` directory.
 To run them you can use builtin PHP server.

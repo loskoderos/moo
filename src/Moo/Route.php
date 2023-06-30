@@ -7,5 +7,5 @@ use LosKoderos\Generic\Model\Model;
 class Route extends Model {
     public string $method;
     public string $uri;
-    public $callback;
+    public mixed $callback;
 }

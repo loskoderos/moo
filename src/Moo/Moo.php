@@ -18,11 +18,10 @@ class Moo {
         $this->before = function() {};
         $this->after = function() {};
         $this->error = function(\Exception $exc) {
-            $this->response = new Response([
-                'code' => $exc->getCode() > 0 ? $exc->getCode() : 500,
-                'message' => StatusCode::message($exc->getCode()),
-                'body' => $exc->getMessage()
-            ]);
+            $this->response->code = $exc->getCode() > 0 ? $exc->getCode() : 500;
+            $this->response->message = StatusCode::message($exc->getCode());
+            $this->response->headers->clear();
+            $this->response->body = $exc->getMessage();
         };
         $this->flush = function() {
             header('HTTP/1.1 ' . $this->response->code . ' ' . $this->response->message);
@@ -98,11 +97,11 @@ class Moo {
         $this->request = isset($request) ? $request : $this->router->requestFactory();
         $this->response = isset($response) ? $response : new Response();
 
-        OutputBuffer::begin();
+        ob_start();
         try {
             is_callable($this->before) ? $this->before() : null;
             
-            $result = $this->router->dispatch($this->request);
+            $result = $this->router->dispatch($this->request, $this->response);
             if ($result !== null) {
                 $this->response->body = $result;
             }
@@ -112,9 +111,9 @@ class Moo {
         } catch (\Exception $exc) {
             is_callable($this->error) ? $this->error($exc) : throw $exc;
         }
-        $this->response->body = $this->response->body . OutputBuffer::end();
+        $this->response->body = $this->response->body . ob_get_clean();
 
-        return is_callable($this->flush) ? $this->flush() : null;
+        return ob_get_level() <= 1 && is_callable($this->flush) ? $this->flush() : null;
     }
 
     public function __call($name, $args)
