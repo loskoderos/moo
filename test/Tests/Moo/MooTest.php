@@ -7,6 +7,7 @@ use Moo\Moo;
 use Moo\Response;
 use Moo\Request;
 use Moo\Router;
+use Moo\Template;
 
 function array_exclude(array $excluded, array $source)
 {
@@ -426,6 +427,73 @@ class MooTest extends TestCase
         $moo(new Request(['uri' => '/b/test']));
         $this->assertEquals(200, $moo->response->code);
         $this->assertEquals('test b', $moo->response->body);
+    }
+
+    public function testTemplateErrors()
+    {
+        $moo = new Moo();
+        $moo->flush = null;
+
+        $moo->template = function (string $script) use ($moo) {
+            return (new Template(__DIR__ . '/templates'))->render($script);
+        };
+
+        $moo->get('/', function () use ($moo) {
+            return $moo->template('dummy.phtml');
+        });
+
+        $moo->get('/test3', function () use ($moo) {
+            return $moo->template('test3.phtml');
+        });
+
+        $moo();
+        $this->assertEquals(500, $moo->response->code);
+
+        $moo(new Request(['uri' => '/test3']));
+        $this->assertEquals(500, $moo->response->code);
+    }
+
+    public function testTemplateLoadWithPartial()
+    {
+        $moo = new Moo();
+        $moo->flush = null;
+
+        $moo->template = function (string $script) use ($moo) {
+            return (new Template(__DIR__ . '/templates'))->render($script);
+        };
+
+        $moo->get('/', function () use ($moo) {
+            return $moo->template('test.phtml');
+        });
+
+        $moo();
+        $this->assertEquals(200, $moo->response->code);
+        $this->assertStringContainsString('test partial', $moo->response->body);
+    }
+
+    public function testTemplateContextAndPlugin()
+    {
+        $moo = new Moo();
+        $moo->flush = null;
+
+        $moo->template = function (string $script, array $context = []) use ($moo) {
+            $template = new Template(__DIR__ . '/templates', [
+                'global' => 'test'
+            ]);
+            $template->plugin = function ($x) { return $x; };
+            return $template->render($script, $context);
+        };
+
+        $moo->get('/', function () use ($moo) {
+            return $moo->template('test2.phtml', [
+                'local' => 'ok',
+                'var' => 123
+            ]);
+        });
+
+        $moo();
+        $this->assertEquals(200, $moo->response->code);
+        $this->assertStringContainsString('test ok 123', $moo->response->body);
     }
 
     /**

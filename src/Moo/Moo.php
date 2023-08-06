@@ -2,7 +2,8 @@
 
 namespace Moo;
 
-class Moo {
+class Moo extends Extendable
+{
     public Request $request;
     public Response $response;
     public Router $router;
@@ -15,14 +16,23 @@ class Moo {
     public function __construct()
     {
         $this->router = new Router();
+
+        // Default pre request hook.
         $this->before = function() {};
+
+        // Default post request hook.
         $this->after = function() {};
+
+        // Default error handler.
         $this->error = function(\Exception $exc) {
-            $this->response->code = $exc->getCode() > 0 ? $exc->getCode() : 500;
-            $this->response->message = StatusCode::message($exc->getCode());
+            $code = $exc->getCode() > 0 ? $exc->getCode() : 500;
+            $this->response->code = $code;
+            $this->response->message = StatusCode::message($code);
             $this->response->headers->clear();
             $this->response->body = $exc->getMessage();
         };
+        
+        // Default flush handler.
         $this->flush = function() {
             header('HTTP/1.1 ' . $this->response->code . ' ' . $this->response->message);
             foreach ($this->response->headers as $name => $value) {
@@ -114,20 +124,6 @@ class Moo {
         $this->response->body = $this->response->body . ob_get_clean();
 
         return ob_get_level() <= 1 && is_callable($this->flush) ? $this->flush() : null;
-    }
-
-    public function __call($name, $args)
-    {
-        foreach ($this as $key => $callback) {
-            if ($key == $name) {
-                if (is_callable($callback)) {
-                    return call_user_func_array($callback, $args);
-                } else {
-                    throw new \BadMethodCallException("Moo::$name is not callable");
-                }      
-            }
-        }
-        throw new \BadMethodCallException("Moo::$name is not callable");
     }
 
     public function __invoke(?Request $request = null, ?Response $response = null): mixed

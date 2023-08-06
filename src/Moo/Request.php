@@ -9,6 +9,7 @@ class Request extends Model
 {
     public string $method;
     public string $uri;
+    public string $baseUri;
     public Collection $headers;
     public Collection $query;
     public Collection $post;
@@ -19,6 +20,7 @@ class Request extends Model
     {
         $this->method = 'GET';
         $this->uri = '/';
+        $this->baseUri = '/';
         $this->headers = new Collection();
         $this->query = new Collection();
         $this->post = new Collection();

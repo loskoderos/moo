@@ -30,6 +30,7 @@ class Router
 
     public function dispatch(Request $request, Response $response): mixed
     {
+        // Parse and match to the first route.
         $uri = parse_url(preg_replace('/(\/+)/', '/', $request->uri))['path'];
         foreach ($this->routes as $route) {
             if ($route->method == '*' || $route->method == $request->method) {
@@ -49,6 +50,7 @@ class Router
 
     public static function requestFactory(): Request
     {
+        // Populate request with default values from $_SERVER.
         $request = new Request();
         $request->method = isset($_SERVER['REQUEST_METHOD']) ? $_SERVER['REQUEST_METHOD'] : 'GET';
         $request->uri = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
@@ -56,6 +58,15 @@ class Router
         $request->query->populate($_GET);
         $request->post->populate($_POST);
         $request->files->populate($_FILES);
+
+        // Auto extract base URI of the script based on execution path.
+        if (isset($_SERVER['PHP_SELF'])) {
+            $request->baseUri = dirname($_SERVER['PHP_SELF']) . '/';
+            if (str_starts_with($request->uri, $request->baseUri)) {
+                $request->uri = '/' . substr($request->uri, strlen($request->baseUri));
+            }
+        }
+
         return $request;
     }
 }

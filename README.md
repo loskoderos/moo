@@ -77,6 +77,46 @@ $moo->get('/books/(\d+)', function ($bookId) use ($moo) {
 $moo();
 ~~~
 
+## Templates
+Moo supports native PHP templates, however you can extend the base class and render templates with any other engine.
+See the `website` example in `examples`.
+~~~php
+use Moo\Moo;
+use Moo\Template;
+
+$moo = new Moo();
+
+// Create template renderer.
+$moo->template = function (string $script, mixed $context = null) use ($moo): string  {
+    // Template and default context.
+    $template = new Template(__DIR__ . '/templates', [
+        'foo' => 'bar'
+    ]);
+
+    // Add 'date' plugin.
+    $template->date = function () {
+        return date('Y-m-d');
+    };
+
+    // Render template.
+    return $template->render($script, $context);
+};
+
+// Index page handler.
+$moo->get('/', function () use ($moo) {
+    return $moo->template('index.phtml', [
+        'hello' => 'world'
+    ]);
+});
+
+~~~
+
+Sample PHP template code.
+~~~php
+<div>foo = <?php echo $foo ?></div>
+<div>date = <?php echo $this->date() ?></div>
+~~~
+
 ## Classy Moo
 Some may need a to write a posh code, if you need style you may try the following.
 ~~~php
