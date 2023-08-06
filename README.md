@@ -112,8 +112,9 @@ $moo->get('/', function () use ($moo) {
 ~~~
 
 Sample PHP template code.
-~~~php
+~~~html
 <div>foo = <?php echo $foo ?></div>
+<div>hello = <?php echo $hello ?></div>
 <div>date = <?php echo $this->date() ?></div>
 ~~~
 
