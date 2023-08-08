@@ -8,31 +8,30 @@ use Moo\Template;
 $moo = new Moo();
 
 // Create template renderer.
-$moo->template = function (string $script, mixed $context = null) use ($moo): string  {
-    // Template and default context.
-    $template = new Template(__DIR__ . '/templates', [
-        'baseUri' => $moo->request->baseUri
-    ]);
+$moo->template = new Template(__DIR__ . '/templates', [
+    'title' => 'Moo Sample Website'
+]);
 
-    // Add 'date' plugin.
-    $template->date = function () {
-        return date('Y-m-d');
-    };
+// Create plugin to extract baseUri.
+$moo->template->baseUri = function () use ($moo) {
+    return $moo->request->baseUri;
+};
 
-    // Render template.
-    return $template->render($script, $context);
+// Create example date plugin.
+$moo->template->date = function () {
+    return date('Y-m-d');
 };
 
 // Index page handler.
 $moo->get('/', function () use ($moo) {
-    return $moo->template('index.phtml', [
+    return $moo->template->render('index.phtml', [
         'hello' => 'Hello World!'
     ]);
 });
 
 // Features page handler.
 $moo->get('/features', function () use ($moo) {
-    return $moo->template('features.phtml', [
+    return $moo->template->render('features.phtml', [
         'features' => [
             'Simple regex routing',
             'Extendable Moo class',
@@ -45,7 +44,7 @@ $moo->get('/features', function () use ($moo) {
 
 // Contact page handler.
 $moo->get('/contact', function () use ($moo) {
-    return $moo->template('contact.phtml', [
+    return $moo->template->render('contact.phtml', [
         'features' => []
     ]);
 });

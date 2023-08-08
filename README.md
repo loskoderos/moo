@@ -87,24 +87,18 @@ use Moo\Template;
 $moo = new Moo();
 
 // Create template renderer.
-$moo->template = function (string $script, mixed $context = null) use ($moo): string  {
-    // Template and default context.
-    $template = new Template(__DIR__ . '/templates', [
-        'foo' => 'bar'
-    ]);
+$moo->template = new Template(__DIR__ . '/templates', [
+    'foo' => 'bar'
+]);
 
-    // Add 'date' plugin.
-    $template->date = function () {
-        return date('Y-m-d');
-    };
-
-    // Render template.
-    return $template->render($script, $context);
+// Custom template plugin.
+$moo->template->date = function () {
+    return date('Y-m-d');
 };
 
 // Index page handler.
 $moo->get('/', function () use ($moo) {
-    return $moo->template('index.phtml', [
+    return $moo->template->render('index.phtml', [
         'hello' => 'world'
     ]);
 });
