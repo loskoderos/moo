@@ -61,7 +61,7 @@ class Router
 
         // Auto extract base URI of the script based on execution path.
         if (isset($_SERVER['PHP_SELF'])) {
-            $request->baseUri = dirname($_SERVER['PHP_SELF']) . '/';
+            $request->baseUri = rtrim(dirname($_SERVER['PHP_SELF']), '/') . '/';
             if (str_starts_with($request->uri, $request->baseUri)) {
                 $request->uri = '/' . substr($request->uri, strlen($request->baseUri));
             }
